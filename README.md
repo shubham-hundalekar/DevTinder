@@ -1,2 +1,0 @@
-# DevTinder
-<p>Node, Express, Database</p>
