@@ -1,21 +1,25 @@
 const express = require("express");
 const app = express();
 
-//Response Handler
-app.get("/user",(req, res)=>{
-    console.log(req.query.userId)
-    console.log(req.query.name)
-    res.send({FirstNaame: "Shubham", LastName: "Hundalekar"});
+app.use("/admin", (req, res, next)=>{
+    const token   = "xyzsad";
+    const isAuthorized = token === "xyz";
+    if(!isAuthorized){
+        res.status(403).send("Access Denied");
+    }else{
+        next();
+    }
 })
-app.get("/user/:userId/:password/:name",(req, res)=>{
-    console.log(req.params)
-    res.send("data received through params");    
+app.get("/admin/getAllData",(req, res)=>{
+    res.send("All data fetched");
 })
-app.post("/user",(req, res)=>{
-    res.send("Data Saved Successfully in Database");
-});
+app.get("/admin/deleteUser",(req, res)=>{
+    res.send("User deleted");
+})
 
 app.listen(3000, () => {
     console.log("Server is running on port 3000");
 });
+
+
 
