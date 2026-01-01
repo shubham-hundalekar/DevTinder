@@ -17,7 +17,16 @@ app.get("/user/getData", userAuth, (req, res)=>{
 })
 
 app.get("/user/deleteAccount", userAuth, (req, res)=>{
-    res.send("User account deleted successfully");
+    try{
+        throw new Error("Some error occurred while deleting account");
+        res.send("User account deleted successfully");
+    }catch(err){
+        res.status(500).send("Internal Server Error");
+    }
+})
+
+app.use("/", (err, req, res, next)=>{
+    res.status(404).send("Something went wrong");   
 })
 
 app.listen(3000, () => {
