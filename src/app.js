@@ -1,20 +1,23 @@
 const express = require("express");
 const app = express();
+const adminAuth = require("./middleware/adminAuth");
+const userAuth = require("./middleware/userAuth");
 
-app.use("/admin", (req, res, next)=>{
-    const token   = "xyzsad";
-    const isAuthorized = token === "xyz";
-    if(!isAuthorized){
-        res.status(403).send("Access Denied");
-    }else{
-        next();
-    }
-})
+app.use("/admin",adminAuth)
 app.get("/admin/getAllData",(req, res)=>{
     res.send("All data fetched");
 })
+
 app.get("/admin/deleteUser",(req, res)=>{
     res.send("User deleted");
+})
+
+app.get("/user/getData", userAuth, (req, res)=>{
+    res.send("User data fetched");
+})
+
+app.get("/user/deleteAccount", userAuth, (req, res)=>{
+    res.send("User account deleted successfully");
 })
 
 app.listen(3000, () => {
