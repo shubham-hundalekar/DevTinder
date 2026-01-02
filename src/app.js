@@ -14,6 +14,32 @@ app.post("/signup", async (req,  res)=>{
     }
 })
 
+//finds a particular document from their emailId
+app.get("/user", async (req, res)=>{
+    const userMail = req.body.emailId;
+    const users = await User.find({emailId: userMail});
+    console.log(users);
+    try{
+        if(users.length === 0){
+            res.status(404).send("User not found");
+        }else{
+            res.send(users);
+        }
+    }catch(err){
+        res.status(404).send("Something went wrong");
+    }
+})
+
+//reterives all the user data from data bas eand sends as responds to the request
+app.get("/feed",async (req, res)=>{
+    try{
+        const users =  await User.find({});
+        res.send(users);
+    }catch(err){
+        res.status(404).send("Something went wrong");
+    }
+})
+
 
 
 connectDB().then(() => {
