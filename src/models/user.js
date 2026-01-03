@@ -3,12 +3,55 @@ const  {Schema} = mongoose
 
 
 const userSchema = new Schema({
-    firstName: String,
-    lastName : String,
-    emailId: String,
-    password: String,
-    gender: String
-})
+    firstName: {
+        type: String,
+        required: true,
+        minLength:5,
+        maxLength:50
+    },
+    lastName :  {
+        type: String
+    },
+    emailId:  {
+        type: String,
+        required: true,
+        lowercase: true,        
+        unique:true,
+        trim:true
+    },
+    password:  {
+        type: String,
+        required: true
+    },
+    age:{
+        type:Number,
+        min:18,
+    },
+    gender:  {
+        type: String,
+        lowercase:true,
+
+        // validate function works when we insert a new "Document"
+        validate(value){
+            if(!["male", "female", "others"].includes(value)){
+                throw new Error("Gender data is not valid")
+            }
+        }
+    },
+    photourl : {
+        type:String,
+        default:"https://www.bing.com/ck/a?!&&p=e6e39f34ee0b484021c1b029bd09b5603df21a782cfcb686278a27421b5f0701JmltdHM9MTc2NzMxMjAwMA&ptn=3&ver=2&hsh=4&fclid=04873276-97ad-6608-39e0-24ce960f67f3&u=a1L2ltYWdlcy9zZWFyY2g_cT1kdW1teStwaG90byt1c2VyK2ltYWdlJmlkPUQ1NDkxQjc0NDNCOUQwRDRFMzg4MkU4NkFCNEUyQzBFNkY4OTMzRkQmRk9STT1JQUNGSVI&ntb=1"
+    },
+    about: { 
+        type : String,
+        default: "This is about me"
+    },
+    skills:{
+        type :[String]
+    }
+},{
+    timestamps:true
+});
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;
