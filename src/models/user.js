@@ -1,6 +1,6 @@
 const mongoose  = require("mongoose")
 const  {Schema} = mongoose
-
+const validator = require("validator");
 
 const userSchema = new Schema({
     firstName: {
@@ -17,11 +17,22 @@ const userSchema = new Schema({
         required: true,
         lowercase: true,        
         unique:true,
-        trim:true
+        trim:true,
+        validate(value){
+            if(!validator.isEmail(value)){
+                throw new Error("Invalid email "+ value)
+            }
+        },
     },
     password:  {
         type: String,
-        required: true
+        required: true,
+        validate(value){
+            if(!validator.isStrongPassword(value)){
+                throw new Error("Enter a strong password: "+value);
+            }
+        }
+
     },
     age:{
         type:Number,
@@ -40,7 +51,13 @@ const userSchema = new Schema({
     },
     photourl : {
         type:String,
-        default:"https://www.bing.com/ck/a?!&&p=e6e39f34ee0b484021c1b029bd09b5603df21a782cfcb686278a27421b5f0701JmltdHM9MTc2NzMxMjAwMA&ptn=3&ver=2&hsh=4&fclid=04873276-97ad-6608-39e0-24ce960f67f3&u=a1L2ltYWdlcy9zZWFyY2g_cT1kdW1teStwaG90byt1c2VyK2ltYWdlJmlkPUQ1NDkxQjc0NDNCOUQwRDRFMzg4MkU4NkFCNEUyQzBFNkY4OTMzRkQmRk9STT1JQUNGSVI&ntb=1"
+        default:"https://www.bing.com/ck/a?!&&p=e6e39f34ee0b484021c1b029bd09b5603df21a782cfcb686278a27421b5f0701JmltdHM9MTc2NzMxMjAwMA&ptn=3&ver=2&hsh=4&fclid=04873276-97ad-6608-39e0-24ce960f67f3&u=a1L2ltYWdlcy9zZWFyY2g_cT1kdW1teStwaG90byt1c2VyK2ltYWdlJmlkPUQ1NDkxQjc0NDNCOUQwRDRFMzg4MkU4NkFCNEUyQzBFNkY4OTMzRkQmRk9STT1JQUNGSVI&ntb=1",
+        validate(value){
+            if(!validator.isURL(value)){
+                throw new Error("Not a valid URL: "+value);
+            }
+
+        }
     },
     about: { 
         type : String,
@@ -48,6 +65,7 @@ const userSchema = new Schema({
     },
     skills:{
         type :[String]
+        
     }
 },{
     timestamps:true
