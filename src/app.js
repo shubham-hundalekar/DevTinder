@@ -3,6 +3,7 @@ const app = express();
 const connectDB = require("./config/database");
 const User = require("./models/user");
 app.use(express.json());
+const validator = require("validator");
 app.post("/signup", async (req,  res)=>{
     
     const user = new User(req.body);
@@ -59,7 +60,9 @@ app.patch("/user/:userId",async (req, res)=>{
             "age",
             "skills",
             "about",
-            "gender"
+            "gender",
+            "photourl",
+            "password"
         ]
 
         isUpdateAllowed = Object.keys(data).every((k)=>(
@@ -68,8 +71,10 @@ app.patch("/user/:userId",async (req, res)=>{
         if(!isUpdateAllowed){
             throw new Error("Update not allowed");
         }
-        if(data?.skills.length>=10){
-            throw new Error("Skills length cannot be greater then 10")
+        if(data?.skills != undefined){
+            if(data?.skills.length>=10){
+               throw new Error("Skills length cannot be greater then 10")
+            }
         }
         await User.findByIdAndUpdate({_id:userId}, data,{
             runValidators:true,
