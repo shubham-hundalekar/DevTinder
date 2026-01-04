@@ -2,20 +2,55 @@ const express = require("express");
 const app = express();
 const connectDB = require("./config/database");
 const User = require("./models/user");
+const {validateSignupData}=require("./utils/validation")
+const bcrypt = require("bcrypt")
+
 app.use(express.json());
-const validator = require("validator");
-app.post("/signup", async (req,  res)=>{
-    
-    const user = new User(req.body);
+
+app.post("/signup", async (req,  res)=>{  
     try{
-        await user.save();
-        res.send("User added successfully");
+        //Validation of data
+        validateSignupData(req);
+        //Encryp the password
+        const {firstName, lastName, emailId} = req.body;        
+        const passwordHash = await bcrypt.hash(req.body.password, 10);
+
+        //creating new user
+        const user = new User(
+            {
+                firstName, 
+                lastName,
+                emailId,
+                password: passwordHash
+            }
+        );
+            await user.save();
+            res.send("User added successfully");
     }catch(err){
-        res.status(400).send("Error saving the data "+err.message)
+        res.status(400).send("Error: "+err.message)
     }
 })
 
-//finds a particular document from their emailId
+app.post("/login",  async (req, res)=>{
+    try{ 
+        const {password, emailId} = req.body;
+        const user = await User.findOne({emailId: emailId});if(!user){
+            throw new Error("Invalid credentails");
+        }
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if(isPasswordValid){
+            res.send("Login successful...")
+        }else{
+            throw new Error("Invalid credentails");
+        }
+    }catch(err){
+        res.status(400).send("Error: "+err.message);
+    } 
+})
+
+
+
+// finds a particular document Sfrom their emailId
 app.get("/user", async (req, res)=>{
     const userMail = req.body.emailId;
     const users = await User.find({emailId: userMail});
