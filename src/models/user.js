@@ -1,7 +1,10 @@
 const mongoose  = require("mongoose")
+const jwt = require("jsonwebtoken")
+require("dotenv").config()
+const bcrypt = require("bcrypt")
+const JWT_SECRET = process.env.JWT_SECRET;
 const  {Schema} = mongoose
 const validator = require("validator");
-
 const userSchema = new Schema({
     firstName: {
         type: String,
@@ -70,6 +73,20 @@ const userSchema = new Schema({
 },{
     timestamps:true
 });
+//methods helps us to generate the token for a particular instance of User collection 
+userSchema.methods.getJWT = async function(){
+    const user = this;
+    const token = await jwt.sign({_id: user._id}, JWT_SECRET);
+
+    return token;
+} 
+
+userSchema.methods.validPassword=async function(passwordByUser){
+    const user = this;
+    const passwordHash = user.password
+    const isPasswordValid = await bcrypt.compare(passwordByUser, passwordHash);
+    return isPasswordValid;
+}
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;
