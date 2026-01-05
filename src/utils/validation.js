@@ -10,7 +10,7 @@ const validateSignupData = (req)=>{
     }else if(!validator.isEmail(emailId)){
         throw new Error("Not a valid Email");
     }
-
+ 
 }
 module.exports={
     validateSignupData

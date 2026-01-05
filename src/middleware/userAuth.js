@@ -1,11 +1,25 @@
-const userAuth = (req,res, next)=>{
-    const token   = "xyz";
-    const isAuthorized = token === "xyz";
-    if(!isAuthorized){
-        res.status(403).send("Access Denied");
-    }else{
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+const JWT_SECRET = process.env.JWT_SECRET;
+const User = require("../models/user")
+const userAuth =async (req,res, next)=>{
+    try{
+        const {token} = req.cookies;
+        if(!token){
+            throw new Error("Token not valid")
+        }
+        const decodedObj = await jwt.verify(token, JWT_SECRET);
+        const {_id} = decodedObj;
+        const user  = await User.findById(_id);
+        if(!user){
+            throw new Error("User not found");
+        }
+        req.user = user;
         next();
-    }
+
+    }catch(err){
+        res.status(400).send("Error: "+err.message);
+    } 
 
 }
 module.exports = userAuth;

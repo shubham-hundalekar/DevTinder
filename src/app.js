@@ -4,8 +4,13 @@ const connectDB = require("./config/database");
 const User = require("./models/user");
 const {validateSignupData}=require("./utils/validation")
 const bcrypt = require("bcrypt")
-
+const cookieParser = require("cookie-parser")
+const jwt = require("jsonwebtoken")
+const userAuth = require("./middleware/userAuth");
+require("dotenv").config()
+const JWT_SECRET = process.env.JWT_SECRET
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signup", async (req,  res)=>{  
     try{
@@ -31,14 +36,31 @@ app.post("/signup", async (req,  res)=>{
     }
 })
 
+app.get("/profile",userAuth, async (req, res)=>{
+    try{
+        const user = req.user;
+        res.send(user);
+    }catch(err){
+        res.status(404).send("Please LOGIN again");
+    }
+})
+
 app.post("/login",  async (req, res)=>{
     try{ 
         const {password, emailId} = req.body;
-        const user = await User.findOne({emailId: emailId});if(!user){
+        const user = await User.findOne({emailId: emailId});
+        if(!user){
             throw new Error("Invalid credentails");
         }
         const isPasswordValid = await bcrypt.compare(password, user.password);
+        //sending cookie to browser
+        
         if(isPasswordValid){
+            //create a jwt token
+            const token = jwt.sign({_id: user._id}, JWT_SECRET);
+            
+            //sending cookie to browser
+            res.cookie("token", token);
             res.send("Login successful...")
         }else{
             throw new Error("Invalid credentails");
