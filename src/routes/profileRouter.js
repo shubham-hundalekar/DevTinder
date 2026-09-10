@@ -23,7 +23,10 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res)=>{
         Object.keys(req.body).forEach((key)=>(editUser[key] = req.body[key]))
         console.log(editUser);
         await editUser.save();
-        res.send(editUser);
+        res.json({
+            msg: `${editUser.firstName} your profile is updated successfully...`,
+            data : editUser,
+        });
     }catch(err){
         res.status(404).send("Error:  "+err.message );
     }
@@ -31,10 +34,11 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res)=>{
 
 profileRouter.post("/profile/password", userAuth,async (req, res)=>{
     try{
-        const newPassword = await bcrypt.hash(req.body.password, 10);
-        if(!validator.isStrongPassword(newPassword)){
+
+        if(!validator.isStrongPassword(req.body.password)){
             throw new Error("Not a strong password")
         }
+        const newPassword = await bcrypt.hash(req.body.password, 10);
         const user = req.user;
         user.password = newPassword;
         user.save()

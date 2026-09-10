@@ -6,12 +6,13 @@ const {validateSignupData}=require("../utils/validation")
 
 authRouter.post("/signup", async (req,  res)=>{  
     try{
+        console.log("signup");
         //Validation of data
         validateSignupData(req);
         //Encryp the password
         const {firstName, lastName, emailId} = req.body;        
         const passwordHash = await bcrypt.hash(req.body.password, 10);
-
+        console.log(req.body);
         //creating new user
         const user = new User(
             {

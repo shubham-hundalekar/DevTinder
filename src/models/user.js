@@ -39,6 +39,7 @@ const userSchema = new Schema({
     },
     age:{
         type:Number,
+        required:true,
         min:18,
     },
     gender:  {
@@ -64,8 +65,12 @@ const userSchema = new Schema({
         default: "This is about me"
     },
     skills:{
-        type :[String]
-        
+        type :[String],
+        validate(value){
+            if(value.length>10){
+                throw new Error("Skills can't be more then 10.");
+            }
+        }
     }
 },{
     timestamps:true
@@ -77,6 +82,8 @@ userSchema.methods.getJWT = async function(){
 
     return token;
 } 
+
+userSchema.index({firstName:1, lastName :1});
 
 userSchema.methods.validPassword=async function(passwordByUser){
     const user = this;
