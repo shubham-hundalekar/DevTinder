@@ -18,7 +18,6 @@ function validateProfileEdit(req){
     const isEditAllowed = Object.keys(req.body).every((field)=>
         allowedEditFields.includes(field)
     )
-    console.log(allowedEditFields);
     return isEditAllowed;
 
 }

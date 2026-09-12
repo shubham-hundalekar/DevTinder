@@ -4,6 +4,7 @@ const profileRouter = express.Router()
 const validator = require("validator")
 const userAuth = require("../middleware/userAuth");
 const {validateProfileEdit} = require("../utils/validation")
+const User = require("../models/user")
 profileRouter.get("/profile/view",userAuth, async (req, res)=>{
     try{
         const user = req.user;
@@ -46,6 +47,17 @@ profileRouter.post("/profile/password", userAuth,async (req, res)=>{
     }
     catch(err){
         res.status(404).send("Error: "+err.message);
+    }
+})
+
+profileRouter.get("/profile/feed",userAuth, async (req, res)=>{
+    try{
+        const user = await User.find();
+        res.send(user);
+    }catch(err){
+        res.status(400).json({
+            msg: err.message
+        })
     }
 })
 
